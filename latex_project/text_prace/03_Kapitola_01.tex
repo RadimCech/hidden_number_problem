@@ -1,24 +1,120 @@
-\chapter{První kapitola}
+\chapter{Teorie}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%% GENERUJ TEXT %%%%%%%%%%%%%
+TODO boneh-venkatesan cely clanek prednaska
 
-\shorthandoff{-} 
-\lipsum[62-67]
-\index{cesky}
-\index{rea}
-\index{ře}
-\index{se}
-\index{še}
-\index{čeština v rejstříku}
-\lipsum[80-84]
+lovacs nerovnost dukaz
 
-\section{Podkapitola}
+bleichenbacher 
 
-\lipsum[98-105]
+screenshot rozvrhu
 
-\subsection{Odstavec}
+oba dva pristupy pochopit na ideove a implementacni urovni(napsat pseudokod do textu)
 
-\lipsum[140-145]
-\shorthandon{-} 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+proof of concept reseni obema zpusoby naprogramovat
+
+
+Sepsat LLL a dopsat odvozeni delta 
+
+\section{Lattice theory}
+Let $B$ be a matrix with rows linearly independant rows $b_i \in \Rbb^d$, then the discrete subgroup $\Lambda(B) = \{\sum v_i b_i | v_i \in \Zbb\}$ is called a \textit{lattice}. 
+
+Let $\pi_i : \Rbb^d \to \operatorname{span}(b_0, \ldots, b_{i-1})^\perp$ be the orthogonal projection into the complement. In particular, $\pi_0 \equiv id$. Then the \textit{Gram-Schmidt orthogonalization} (GSO) of B is $B^* = (b_0, \ldots, b_{i-1})$, where $b^*_i = \pi_i(b_i) = b_i - \sum_{j=0}^{i-1} \mu_{i,j} \cdot b_j^*$ and $\mu_{i,j} = \langle \boldsymbol{b}_i, \boldsymbol{b}_j^* \rangle / \langle \boldsymbol{b}_j^*, \boldsymbol{b}_j^* \rangle$. 
+
+Let $|| \cdot ||$ be the euclidean norm. Denote by $\lambda_i(\Lambda)$ the radius of theh smallest ball centered at the origin containing at least $i$ linearly independant lattice vectors. In particular, $\lambda_1(\Lambda)$ is the norm of the shortest vector of $\Lambda$.
+
+Next we define the Gaussian heuristic to aproximate the shortest vector of a lattice.
+
+\begin{definition}
+    Let $\Lambda(B)$ be a lattice. Denote by $\operatorname*{vol}(\Lambda) = \operatorname*{det}(B)$ the determinant of the basis and $\mathbb{B}_d(R)$ the $d$-dimensional euclidean ball. Then 
+    \begin{equation*}
+        \mathrm{gh}(\Lambda) = \left(\frac{\mathrm{Vol}(\Lambda)}{\mathrm{Vol}(\mathfrak{B}_d(1))}\right)^{1/d} = \frac{\Gamma\left(1+\frac{d}{2}\right)^{1/d}}{\sqrt{\pi}} \cdot \mathrm{Vol}(\Lambda)^{1/d} \approx \sqrt{\frac{d}{2\pi e}} \cdot \mathrm{Vol}(\Lambda)^{1/d}
+    \end{equation*}
+    is called the \textit{Gaussian heuristic}.
+\end{definition}
+
+The main problem in lattice thoery is to find the shortest vector of a lattice.
+
+\begin{definition}[Shortest Vector Problem (SVP)]
+    Let $\Lambda(B)$ be a lattice. Find the shortest nonzero vector in $\Lambda(B)$.
+\end{definition}
+
+We will be interested in finding closest vector to the lattice which is guaranteed to not be too far away from the lattice.
+
+\begin{definition}[$\alpha$-Bounded Distance Decoding (BDD$_\alpha$)]
+    Given a lattice $\Lambda(B)$, a vector $t$ and a parameter $ \alpha > 0$ such that the euclidean distance between $t$ and the lattice $\operatorname*{dist}(t,B) < \alpha \cdot \lambda_1(\Lambda(B))$, find the lattice vector $v \in \Lambda(B)$ closest to $t$.
+\end{definition}
+
+To guarantee a unique solution, it is required that $\alpha < 1/2$. There is a generalization of the problem for $1/2 < \alpha < 1$, where we want to find a unique solution with high probability. Asymptotically, for any polynomially-bounded $\gamma \geq 1$ there is a reduction from BDD$_{1/\sqrt{2}\gamma}$ to $uSVP_\gamma$ from the following definition.
+
+\begin{definition}[$\gamma$-Unique Shortest Vector Problem(uSVP$_\gamma$)]
+    Let $\Lambda$ be a lattice such that $\lambda_2(\Lambda) > \gamma \cdot \lambda_1(\Lambda)$, find a nonzero vector $v \in \Lambda$ of length $\lambda_1(\Lambda)$.
+\end{definition}
+
+The mentioned reduction is due to Kannan's embedding, that constructs
+
+\begin{equation*}
+    L = \begin{pmatrix} 
+        B & 0 \\ 
+        t & \tau 
+        \end{pmatrix}
+\end{equation*}
+
+where $\tau$ is some embedding factor. If $v$ is the closest vector to $t$, then the lattice $\Lambda(L)$ contains $(t - v, \tau)$, which is small.
+
+We will need some lattice algorithms.
+
+\begin{definition}[Enumeration]
+    Consider the following problem: Given a matrix $B$ and a bound $R$, find all lattice vectors $v = \sum_{i=0}^{d-1} u_i \cdot b_i |_{u_i \in \Zbb}$ with some $u_i \not = 0$ and $\|v\|^2 < R^2$. Then by lattice vector enumeration we can pick the smallest one and solve the SVP.
+
+    We can rewrite the vector $v$ with the Gram-Schmidt basis:
+    \begin{align*}
+        v = \sum_{i=0}^{d-1} u_i \cdot b_i &= \sum_{i=0}^{d-1} u_i \cdot \left( b_i^* + \sum_{j=0}^{i-1} \mu_{i,j} \cdot b_j^* \right) = \sum_{j=0}^{d-1} \left( u_j + \sum_{i=j+1}^{d-1} u_i \cdot \mu_{i,j} \right) \cdot b_j^*.
+    \end{align*}
+    And thanks to orthogonality, the norms of the projections $\pi_k(v)$ become
+    \begin{equation*}
+        \| \pi_k(v) \|^2 = \left\| \sum_{j=k}^{d-1} \left( u_j + \sum_{i=j+1}^{d-1} u_i \, \mu_{i,j} \right) b_j^* \right\|^2 = \sum_{j=k}^{d-1} \left( u_j + \sum_{i=j+1}^{d-1} u_i \, \mu_{i,j} \right)^2 \cdot \| b_j^* \|^2.
+    \end{equation*}
+    So the norms play nicely with the parameter $k$. Begin with finding $\pi_d(v)$ such that $\| \pi_d(v) \|^2 < R^2$
+    and iterate the inequality over $d$. This defines a depth-first tree search. We find a candidate for $u_{d-1}$ and continue to $u_{d-2}$ level. Whenever we encounter no candidates, we abandon the branch and backtrack. When we reach the leaves $u_0$, we compare the candidates to the previously smallest found vector and backtrack.
+\end{definition}
+
+\begin{definition}[Sieving]
+    The lattice sieve algorithm takes a set of lattice vectors $L \subset \Lambda$ and searches for integer combinations that are short. By recursively doing this process we can solve the SVP.
+\end{definition}
+
+\begin{definition}[BKZ]
+    
+\end{definition}
+
+
+\section{The Hidden Number Problem}
+
+\begin{definition}
+Let $n$ be prime, and $\alpha$ is a secret integer. An oracle generates random, uniformly distributed $t_i \in \mathbb{Z}_n$ and  computes 
+\begin{equation}\label{eqHNP}
+    s_i = t_i \cdot \alpha \mod n
+\end{equation}
+and reveals some most important bits of $s_i$ and $t_i$. The adversery is given the pair $(t_i, a_i)$ with the revealed bits. Then we can write \eqref{eqHNP} as 
+\begin{equation*}
+    a_i + k_i = t_i \cdot \alpha,
+\end{equation*}
+where $k_i < 2^l$ for some parameter $l \in \mathbb{N}$.
+\end{definition}
+
+Some leaks in the (EC)DCA and Diffie-Hellman can be mapped to the HNP, which is traditionally solved by lattice reduction or the Bleichenbacher attack.
+
+\subsection{Solving the HNP with Lattices}
+Boneh and Vankatesan construct the following lattice for solving the HNP
+\begin{equation}
+    \begin{bmatrix}
+    n & 0 & 0 & \cdots & 0 & 0 \\
+    0 & n & 0 & \cdots & 0 & 0 \\
+    \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+    0 & 0 & 0 & \cdots & n & 0 \\
+    t_0 & t_1 & t_2 & \cdots & t_{m-1} & \frac{1}{n}
+    \end{bmatrix},
+\end{equation}
+and we want to find the vector $(a_0, \ldots, a_{m-1}, 0)$. The vector $([t_0 \cdot \alpha]_p, \dots, [t_{m-1}\alpha]_p, \alpha/n)$ is within $\sqrt{m+1}\cdot 2^l$ of the desired vector for $|k_i| < 2^l$.
+
+\subsection{HNP and Bleichenbacher}
+eHNP, 

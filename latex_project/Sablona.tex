@@ -47,13 +47,13 @@
 %%%%%%%%%%%%
 
 % \usepackage{bookman}
-% \usepackage{charter}
+%\usepackage{charter}
 % \usepackage{fourier}
 % \usepackage{mathpazo}
 % \usepackage{newcent}
 % \usepackage{palatino}
 % \usepackage{utopia}
-\usepackage{mathptmx}  %% volne dostupny font Adobe Times Roman
+%  \usepackage{mathptmx}  %% volne dostupny font Adobe Times Roman
 %  \usepackage[mtbold,mtplusscr,mtpluscal]{mathtime} % komercni matematicky font, dostupne pouze na UMS
 
 
@@ -76,13 +76,24 @@
 %% NASTAVTE KONKRETNI UDAJE V CESTINE A ANGLICTINE  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage[Bc,Barevne]{sci.muni.thesis}
+\usepackage[Mgr,Barevne]{sci.muni.thesis}
 %% Mozne volby:
 %% Bc - pro bakalarskou praci
 %% Mgr - pro diplomovou praci
 %% RNDr - pro rigorozni praci
 %% Barevne - pro dokument s barevnymi odkazy
 %% Tisk - pro dokument v cernobile barve
+
+\usepackage{tocloft}
+\setlength{\cftchapnumwidth}{6em}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
 
 \NazevUstavu{Název ústavu}{Department of ...}
 
@@ -186,7 +197,6 @@ citovány.}
 \newcommand{\Rbb}{\mathbb{R}}
 \newcommand{\Zbb}{\mathbb{Z}}
 \newcommand{\Nbb}{\mathbb{N}}
-\DeclareMathOperator{\tg}{tg}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%% VYTVOR POMOCNY SOUBOR PRO REJSTRIK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -284,10 +294,11 @@ citovány.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%% OBSAH %%%%%%%%%%%%%%%%%%%%%%%%
 
+\sloppy
 \pdfbookmark{Obsah}{Obsah}
 \VytvorObsah
 \cleardoublepage
-
+\fussy
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEXT PRACE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
