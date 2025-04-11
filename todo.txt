@@ -1,4 +1,9 @@
 28/03/2025
-zjistit limit(leak size a pocet zaznamu) pro lattice pristup pro 256-bit prime
+zjistit limit(leak size a pocet zaznamu) pro lattice pristup pro 256-bit prime done
 dodelat bleichenbacher pristup
 zjistit jaky je rozdil mezi sort and difference a lattice reduction pro bleichenbacher pristup
+
+03/04/2025
+limit pro lattice reduction
+obstarat celou implementaci bleichenbacher
+zacit strukturu prace
