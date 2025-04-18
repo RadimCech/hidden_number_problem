@@ -5,5 +5,10 @@ zjistit jaky je rozdil mezi sort and difference a lattice reduction pro bleichen
 
 03/04/2025
 limit pro lattice reduction
-obstarat celou implementaci bleichenbacher
+cela implementace bleichenbacher
+zacit strukturu prace
+
+17/04/2025
+jaky je cil pro bleichenbacher
+dalsi algorithmy pro range reduction
 zacit strukturu prace
