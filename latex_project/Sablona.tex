@@ -68,7 +68,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% BALIKY POTREBNE PRO MATEMATIKU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{amsmath,amssymb,amsthm}
-
+\usepackage{enumitem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% NASTAVENI POVINNYCH CASTI DLE SMERNICE DEKANA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -87,6 +87,12 @@
 \usepackage{tocloft}
 \setlength{\cftchapnumwidth}{6em}
 
+
+\usepackage{mathtools, nccmath}
+\DeclarePairedDelimiter{\nint}\lfloor\rceil
+
+\DeclarePairedDelimiter{\floor}\lfloor\rfloor
+
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \theoremstyle{definition}
@@ -94,6 +100,7 @@
 \newtheorem{example}[theorem]{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+
 
 \NazevUstavu{Název ústavu}{Department of ...}
 

@@ -1,22 +1,11 @@
 \chapter{Teorie}
 
-TODO boneh-venkatesan cely clanek prednaska
 
-lovacs nerovnost dukaz
-
-bleichenbacher 
-
-screenshot rozvrhu
-
-oba dva pristupy pochopit na ideove a implementacni urovni(napsat pseudokod do textu)
-
-proof of concept reseni obema zpusoby naprogramovat
-
-
-Sepsat LLL a dopsat odvozeni delta 
-
+mozna do appendixu :D
 \section{Lattice theory}
-Let $B$ be a matrix with rows linearly independant rows $b_i \in \Rbb^d$, then the discrete subgroup $\Lambda(B) = \{\sum v_i b_i | v_i \in \Zbb\}$ is called a \textit{lattice}. 
+\begin{definition}
+    Let $B$ be a matrix with rows linearly independant rows $b_i \in \Rbb^d$, then the discrete subgroup $\Lambda(B) = \{\sum v_i b_i | v_i \in \Zbb\}$ is called a \textit{lattice}.   
+\end{definition}
 
 Let $\pi_i : \Rbb^d \to \operatorname{span}(b_0, \ldots, b_{i-1})^\perp$ be the orthogonal projection into the complement. In particular, $\pi_0 \equiv id$. Then the \textit{Gram-Schmidt orthogonalization} (GSO) of B is $B^* = (b_0, \ldots, b_{i-1})$, where $b^*_i = \pi_i(b_i) = b_i - \sum_{j=0}^{i-1} \mu_{i,j} \cdot b_j^*$ and $\mu_{i,j} = \langle \boldsymbol{b}_i, \boldsymbol{b}_j^* \rangle / \langle \boldsymbol{b}_j^*, \boldsymbol{b}_j^* \rangle$. 
 
@@ -82,6 +71,9 @@ We will need some lattice algorithms.
     The lattice sieve algorithm takes a set of lattice vectors $L \subset \Lambda$ and searches for integer combinations that are short. By recursively doing this process we can solve the SVP.
 \end{definition}
 
+\begin{definition}[LLL]
+    
+\end{definition}
 \begin{definition}[BKZ]
     
 \end{definition}
@@ -90,20 +82,73 @@ We will need some lattice algorithms.
 \section{The Hidden Number Problem}
 
 \begin{definition}
-Let $n$ be prime, and $\alpha$ is a secret integer. An oracle generates random, uniformly distributed $t_i \in \mathbb{Z}_n$ and  computes 
+Let $q$ be prime, $x$ a secret integer and $T_b = (q-1)/2^b$. An oracle generates random, uniformly distributed $c_j \in [1,\ldots, q-1],$ $k_j \in [-\nint{T_{b+1}}, \ldots, \floor{T_{b+1}}]$ and computes 
 \begin{equation}\label{eqHNP}
-    s_i = t_i \cdot \alpha \mod n
+    h_j = (k_j - c_j \cdot x) \mod q.
 \end{equation}
-and reveals some most important bits of $s_i$ and $t_i$. The adversery is given the pair $(t_i, a_i)$ with the revealed bits. Then we can write \eqref{eqHNP} as 
-\begin{equation*}
-    a_i + k_i = t_i \cdot \alpha,
-\end{equation*}
-where $k_i < 2^l$ for some parameter $l \in \mathbb{N}$.
+The adversery is given the pairs $(h_j, c_j)$, $0<j<L$ and the goal is to recover $x$. We call this an instance of the \textit{hidden number problem} with a leak of $b$-bits.
 \end{definition}
 
 Some leaks in the (EC)DCA and Diffie-Hellman can be mapped to the HNP, which is traditionally solved by lattice reduction or the Bleichenbacher attack.
+\section{The Bleichenbacher Approach to the HNP}
+\begin{definition}
+    Let $X$ be a random variable over $\Zbb \ q \Zbb$. Define \textit{bias} of $X$ as 
+    \begin{equation}
+        B(X) = E(e^{2\pi i X / q}) = B(X \mod q).
+        \tag{5}
+        \end{equation}
+        For a set of points $V = (v_0, v_1, \dots, v_{L-1})$ in $\mathbb{Z}/q\mathbb{Z}$, define the \textit{sampled bias} as
+        \begin{equation}
+        B(V) = \frac{1}{L} \sum_{j=0}^{L-1} e^{2\pi i v_j / q}.
+        \tag{6}
+    \end{equation}
 
-\subsection{Solving the HNP with Lattices}
+    \begin{lemma}
+        Let $X$ be uniformly distributed on $[-(T-1)/2, \ldots, (T-1)/2]$ for some bound $0 < T \leq q$, then
+        \begin{enumerate}[label=\arabic*.]
+            \item For independent random variables \(X\) and \(Y\), \(B(X + Y) = B(X)B(Y)\).
+            \item \(B(X) = \frac{1}{T} \sin\left(\frac{\pi T / q}{\sin(\pi / q)}\right)\). So \(B(X)\) is real-valued and \(0 \leq B(X) \leq 1\).
+            \item If $T = q$, then \(B(X) = 0\).
+            \item Let \(a\) be an integer with \(|a|T \leq q\), and \(Y = aX\). Then \(B(Y) = \frac{1}{T} \sin\left(\frac{\pi a T / q}{\sin(\pi a / q)}\right)\).
+            \item \(B(Y) \leq B(X)^{|a|}\).
+        \end{enumerate} 
+    \end{lemma}
+\end{definition}
+
+\begin{example}[Bias estimation]
+    
+\end{example}
+The idea of the Bleichenbacher attack is the following. Take a guess for the secret key $\omega \in \mathbb{Z}_q$ and let $B(\omega)$ be the bias of the set $\{h_j + c_j \cdot \omega \mod q\}$. Then we expect $\omega = x$ to be the unique number such that the bias $B(\omega)$ will be significantly nonzero, while for all other $\omega \not=x$ the bias should be close to zero. To see this compute 
+\begin{align}
+    B_q(\omega) 
+    &= \frac{1}{L} \sum_{j=0}^{L-1} e^{2\pi i (h_j + c_j \omega)/q} 
+    = \sum_{t=0}^{q-1} \left( \frac{1}{L} \sum_{\substack{\{j \mid c_j = t\}}} e^{2\pi i h_j / q} \right) e^{2\pi i t \omega / q} \notag\\
+    &= \sum_{t=0}^{q-1} \left( \frac{1}{L} \sum_{\substack{\{j \mid c_j = t\}}} e^{2\pi i (h_j + c_j x)/q} \right) e^{2\pi i t (\omega - x)/q} \notag\\
+    &= \sum_{t=0}^{q-1} \left( \frac{1}{L} \sum_{\substack{\{j \mid c_j = t\}}} e^{2\pi i k_j / q} \right) e^{2\pi i t (\omega - x)/q}. \label{eqBiasVypocet}
+\end{align} 
+
+When $\omega = x$, $B(\omega) = \frac{1}{L} \sum_{j=0}^{L-1} e^{2\pi i k_j / q}$ is exactly the sampled bias of the $k_j$s. Assuming a $b$-bit leak and $L$ large enough, $B(X)$ will be close to $1$, since the points $e^{2\pi i k_j /q}$ lie in the part of the unit circle with phase $-\pi/2^b < \theta < \pi/2^b$. $B(\omega)$ will be close to zero for $\omega \not =x$, since the points will be distributed over the whole circle because of the $e^{2\pi i t (\omega - x)/q}$ term in \eqref{eqBiasVypocet}.
+
+Now evaluating this sum for all $\omega \in \Zbb_q$ is not feasible. Notice from \eqref{eqBiasVypocet} that $B(\omega)$ is a sum of terms $e^{2\pi i t \omega/q}$ with frequencies $t/q$. If the frequencies $t/q$ are much smaller than $1$, then the peak of $B(\omega)$ will broaden allowing us to search only over a sparse set of $\omega$. To achieve this we need to reduce the size of the $c_j$s. Assuming that $c_j < C$ for some $C$, and letting $n = 2C$, we can find the $n$ most significant bits of $x$ by searching for a peak in $n$ evenly spaced values of $\omega \in \mathbb{Z}_q$. Set $\omega_m = mq/n, m\in [0,n-1]$. Then 
+
+\begin{align}
+    B_q(\omega_m) 
+    &= \frac{1}{L} \sum_{j=0}^{L-1} e^{2\pi i (h_j + (c_j m q / n))/q} 
+    = \frac{1}{L} \sum_{j=0}^{L-1} e^{(2\pi i h_j / q) + (2\pi i c_j m / n)} \notag \\
+    &= \sum_{t=0}^{n-1} \left( \frac{1}{L} \sum_{\substack{\{j \mid c_j = t\}}} e^{2\pi i h_j / q} \right) e^{2\pi i t m / n} 
+    = \sum_{t=0}^{n-1} Z_t e^{2\pi i t m / n}. \tag{8}
+\end{align}
+is the inverse FFT of $Z = (Z_0, \ldots, Z_{n-1})$. Find the $m$ for which $B(\omega_m)$ is maximal, then the most significant $n$ bits of $x$ are $msb_n(x) = msb_n(mq/n)$. So $n$ is determined by the maximum FFT we can compute. If we can reduce the $c_j$ below $C$, then we can iteratively recover the whole secret key.
+
+
+There are various approaches to range reduction. The original Bleichenbacher presentation proposes the sort and difference algorithm.
+
+\begin{definition}[Sort and Difference]
+    
+\end{definition}
+
+
+\section{Solving the HNP with Lattices}
 Boneh and Vankatesan construct the following lattice for solving the HNP
 \begin{equation}
     \begin{bmatrix}
@@ -115,6 +160,3 @@ Boneh and Vankatesan construct the following lattice for solving the HNP
     \end{bmatrix},
 \end{equation}
 and we want to find the vector $(a_0, \ldots, a_{m-1}, 0)$. The vector $([t_0 \cdot \alpha]_p, \dots, [t_{m-1}\alpha]_p, \alpha/n)$ is within $\sqrt{m+1}\cdot 2^l$ of the desired vector for $|k_i| < 2^l$.
-
-\subsection{HNP and Bleichenbacher}
-eHNP, 
