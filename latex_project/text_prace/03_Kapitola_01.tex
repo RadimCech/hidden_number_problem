@@ -138,12 +138,30 @@ Now evaluating this sum for all $\omega \in \Zbb_q$ is not feasible. Notice from
 \end{align}
 is the inverse FFT of $Z = (Z_0, \ldots, Z_{n-1})$. Find the $m$ for which $B(\omega_m)$ is maximal, then the most significant $n$ bits of $x$ are $msb_n(x) = msb_n(mq/n)$. So $n$ is determined by the maximum FFT we can compute. If we can reduce the $c_j$ below $C$, then we can iteratively recover the whole secret key.
 
-
+\subsection{Range reduction}
 There are various approaches to range reduction. The original Bleichenbacher presentation proposes the sort and difference algorithm.
 
-\begin{definition}[Sort and Difference]
-    
-\end{definition}
+\begin{enumerate}
+    \item Sort the list $\{(h_i, s_i)\}_{i=0}^{L-1}$ in ascending order by the $h_i$ values.
+    \item Take the successive differences to create a new list $\{(h_i', s_i')\}_{i=0}^{L-2} = \{(h_{i+1} - h_i, s_{i+1} - s_i)\}_{i=0}^{L-2}$.
+    \item Repeat.
+\end{enumerate}
+
+In the original presentation, Bleichenbacher mentioned the use of the Schroeppel–Shamir algorithm, a knapsack problem solver, for the range reduction phase. The paper (newbleichenbahcer records) transforms the Schroeppel–Shamir knapsack solver into a range reduction algorithm. The idea is to 
+
+\begin{enumerate}
+    \item Split the set $S$ of $2^{\alpha +2}$ of input signatures into $4$ lists $\mathcal{L}^1, \mathcal{R}^1, \mathcal{L}^2, \mathcal{R}^2$ of size $2^\alpha$.
+    \item Fix a $c \in [0,2^\alpha] \cap  \mathbb{Z}$ and create lists $\mathcal{A}^r, r \in 1,2$, that contain the combinations of two samples $(\eta^r, \xi^r) = \mathcal{L}^r(i) + \mathcal{R}^r(j) = (c_i^r + c_j^r, h_i^r + h_j^r)$ such that $\eta^r$'s $(\alpha + 1)$ most significant bits are the same as $c$'s, that is $MSB_{\alpha + 1}(\eta^r) = MSB_{\alpha + 1}(c)$. 
+    \item Sort $\mathcal{A}^1, \mathcal{A}^2$ by the first coordinate and extract short combinations.
+\end{enumerate}
+pseudokod je v (new bleichanbcher)
+
+
+
+
+
+
+
 
 
 \section{Solving the HNP with Lattices}
