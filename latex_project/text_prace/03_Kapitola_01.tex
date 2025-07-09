@@ -1,6 +1,7 @@
 \chapter{Teorie}
 
 \section{Lattice theory}
+
 \begin{definition}
     Let $B$ be a matrix with rows linearly independant rows $b_i \in \Rbb^d$, then the discrete subgroup $\Lambda(B) = \{\sum v_i b_i | v_i \in \Zbb\}$ is called a \textit{lattice}.   
 \end{definition}
@@ -78,6 +79,7 @@ We will need some lattice algorithms.
 
 
 \section{The Hidden Number Problem}
+Some leaks in the (EC)DCA and Diffie-Hellman can be mapped to the HNP, which is traditionally solved by lattice reduction or the Bleichenbacher attack.
 
 \begin{definition}
 Let $q$ be prime, $x$ a secret integer and $T_b = (q-1)/2^b$. An oracle generates random, uniformly distributed $c_j \in [1,\ldots, q-1],$ $k_j \in [-\nint{T_{b+1}}, \ldots, \floor{T_{b+1}}]$ and computes 
@@ -87,7 +89,9 @@ Let $q$ be prime, $x$ a secret integer and $T_b = (q-1)/2^b$. An oracle generate
 The adversery is given the pairs $(h_j, c_j)$, $0<j<L$ and the goal is to recover $x$. We call this an instance of the \textit{hidden number problem} with a leak of $b$-bits.
 \end{definition}
 
-Some leaks in the (EC)DCA and Diffie-Hellman can be mapped to the HNP, which is traditionally solved by lattice reduction or the Bleichenbacher attack.
+In the (EC)DSA input, the nonces $k$ are generally positive, but both the methods we will consider work for any sign of $k$. We can therefore reduce the bitsize by centering $k$ around $0$, i.e. substituting $\bar{k} = k - 2^{l-1}$. So that is the reason for the interval.
+
+
 \section{The Bleichenbacher Approach to the HNP}
 \begin{definition}
     Let $X$ be a random variable over $\Zbb \ q \Zbb$. Define \textit{bias} of $X$ as 
@@ -155,16 +159,11 @@ In the original presentation, Bleichenbacher mentioned the use of the Schroeppel
     \item Sort $\mathcal{A}^1, \mathcal{A}^2$ by the first coordinate and extract short combinations.
 \end{enumerate}
 pseudokod je v (new bleichanbcher)
-
-
-
-
-
-
-
-
-
+\newpage
 \section{Solving the HNP with Lattices}
+
+Papers related to the lattice approach define the leak simply as $k_j \in [-2^l, \ldots, 2^l] \cap \Zbb$ for some $l$. Let $q$ be an $s$-bit prime, then $q < 2^{s}$ and $(q-1)/2^{b} < 2^{s-b}$. So we can relax the bound and assume $k_j \in [-2^l, \ldots, 2^l] \cap \Zbb$, for $l = s-b$.
+
 Boneh and Vankatesan construct the following lattice for solving the HNP
 \begin{equation}
     \begin{bmatrix}
@@ -172,7 +171,34 @@ Boneh and Vankatesan construct the following lattice for solving the HNP
     0 & n & 0 & \cdots & 0 & 0 \\
     \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
     0 & 0 & 0 & \cdots & n & 0 \\
-    t_0 & t_1 & t_2 & \cdots & t_{m-1} & \frac{1}{n}
+    c_0 & c_1 & c_2 & \cdots & c_{m-1} & \frac{1}{n}
     \end{bmatrix},
 \end{equation}
-and we want to find the vector $(a_0, \ldots, a_{m-1}, 0)$. The vector $([t_0 \cdot \alpha]_p, \dots, [t_{m-1}\alpha]_p, \alpha/n)$ is within $\sqrt{m+1}\cdot 2^l$ of the desired vector for $|k_i| < 2^l$.
+and we want to find the vector $(h_0, \ldots, h_{m-1}, 0)$. We have $(h_j + c_j \cdot x) \mod{q} = k_j$ and  $ |k_j|< 2^l$. Therefore the vector $([c_0 \cdot x]_p, \dots, [c_{m-1}x]_p, x/n)$ is within $\sqrt{m+1}\cdot 2^l$ of the desired vector for $|k_i| < 2^l$. 
+
+By the uniqueness theorem (boneh) if we can solve the CVP, we can solve the hidden number problem. We proceed by transforming the CVP to the SVP via Kannan's embedding. Construct the lattice 
+\[
+\begin{bmatrix}
+n & 0 & 0 & \cdots & 0 & 0 & 0 \\
+0 & n & 0 & \cdots & 0 & 0 & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & n & 0 & 0 \\
+c_0 & c_1 & c_2 & \cdots & c_{m-1} & 2^\ell / n & 0 \\
+h_0 & h_1 & h_2 & \cdots & h_{m-1} & 0 & 2^\ell
+\end{bmatrix}
+\]
+This lattice contains a vector
+\[
+(k_0, k_1, \ldots, k_{m-1}, 2^\ell \cdot x / n, 2^\ell),
+\]
+which has norm at most $\sqrt{m+2} \cdot 2^l$. This lattice also contains $(0,\ldots, 2^l, 0)$, so it is not generally the shortest vector. Heninger suggests some improvements for this lattice.
+
+By eliminating $x$ from the $0$-th equation $h_0 = (k_j - c_jx) \mod{q}$ we get
+\begin{equation*}
+    -c_0^{-1}(h_0 - k_0) = x \mod{q}
+\end{equation*}
+Now by eliminating $x$ from the $j$-th equation we get
+\begin{equation*}
+    h_j - c_j \cdot c_0^{-1}h_0 = (k_j - c_j \cdot c_0^{-1}k_0) \mod{q}
+\end{equation*}
+Thus we have reduced the dimension of the lattice by 1. The vector $(0,\ldots, 2^l, 0)$ is no longer in the lattice and the new target $(k_1, \ldots, k_{m-1}, k_0, 2^l)$ is expected to be the unique shortest vector. This transformation is analogous to the normal form for LWE
